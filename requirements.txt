@@ -1,0 +1,8 @@
+# requirements.txt
+
+fastapi
+uvicorn[standard]
+requests
+redis
+rq
+beautifulsoup4
