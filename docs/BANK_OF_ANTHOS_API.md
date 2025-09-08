@@ -23,16 +23,36 @@ The application follows a **traditional form submission** pattern with page relo
 
 * **Step 3: Successful Response**
     * **Status Code:** `302 FOUND`
-    * **Key Response Headers:** `Location: /home`
-    * **Session Mechanism:** The `frontend` service receives the credentials, internally calls the `userservice` to get a JWT, and manages the user's session via **cookies** in subsequent responses. Our client must store and resend these cookies.
+    * **Key Response Headers:** `Location: /home`, `Set-Cookie`
+    * **Session Mechanism:** The server responds with a `Set-Cookie` header containing a session token. Our client must store this cookie.
 
 ---
 
-## 2. Balance and Transaction Query Flow
+## 2. Data Extraction Flow
 
-*(This section will be completed once we analyze these requests, but it will follow a similar pattern)*
+**Objective:** Fetch the account balance and transaction history after a successful login.
 
-* **Endpoint:** `/` (Home page)
-* **Method:** `GET`
-* **Authentication:** Requires the **session cookie** obtained after a successful login.
-* **Response:** The page's HTML, from which we will need to parse the balance and transaction list.
+* **Step 1: Request Home Page**
+    * **Endpoint:** `/home`
+    * **Method:** `GET`
+    * **Authentication:** Requires the **session cookie** obtained from the login step to be sent in the `Cookie` request header.
+
+* **Step 2: Successful Response**
+    * **Status Code:** `200 OK`
+    * **Content:** The full HTML of the user's account page.
+
+* **Step 3: HTML Parsing**
+    Our client must parse the received HTML to extract the data. The following selectors should be used:
+
+    * **Account Balance:**
+        * **Selector:** `span#current-balance`
+        * **Example:** `<span class="h1 mb-0" id="current-balance">$7,346.05</span>`
+        * **Action:** Extract the text content and parse it to a number.
+
+    * **Transaction List:**
+        * **Container Selector:** `tbody#transaction-list`
+        * **Row Selector:** `tr` (Iterate over each `<tr>` inside the container)
+        * **Data Selectors per row:**
+            * **Date:** `td.transaction-date`
+            * **Label:** `td.transaction-label`
+            * **Amount:** `td.transaction-amount`
