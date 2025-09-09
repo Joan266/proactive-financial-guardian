@@ -1,0 +1,136 @@
+# .gitignore
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de entorno - ¡MUY IMPORTANTE!
+# Ignora todos los archivos .env para no subir secretos al repositorio.
+.env*
+!/.env.example
+
+# Base de datos
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+db.sqlite3
+db.sqlite3-journal
+fraudcheck.db
+fraudcheck.db-journal
+
+# Archivos de configuración
+*.json
+env.yaml
+docker-compose.yml
+
+# Python - Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Python - Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Python - PyInstaller
+*.manifest
+*.spec
+
+# Python - Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Python - Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Python - Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak
+venv.bak
+
+# Python - Poetry
+poetry.lock
+
+# Python - PEP 582
+__pypackages__/
+
+# Python - pyenv
+.python-version
+
+# Django
+*.log
+local_settings.py
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Sphinx
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# SageMath
+*.sage.py
+
+# IDEs y editores
+.idea/
+.vscode/
+*.swp
+
+# Docker
+.dockerignore
+
+# Archivos de registro
+*.log
+
+# Binarios descargados localmente
+cloud-sql-proxy
+
+client_secrets.json
