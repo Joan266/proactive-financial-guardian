@@ -1,8 +1,8 @@
 # app/main.py
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse # Import HTMLResponse
+from fastapi.responses import HTMLResponse 
 from starlette.middleware.sessions import SessionMiddleware
-from .api import auth  # Import our new auth router
+from .api import auth, tasks 
 
 app = FastAPI(title="Proactive Financial Guardian API")
 
@@ -11,6 +11,7 @@ app.add_middleware(SessionMiddleware, secret_key="YOUR_SECRET_KEY_HERE")
 
 # Include routers from other files
 app.include_router(auth.router)
+app.include_router(tasks.router)
 
 @app.get("/", tags=["Root"])
 async def root():
