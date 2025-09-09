@@ -6,3 +6,13 @@ requests
 redis
 rq
 beautifulsoup4
+itsdangerous
+
+# Database
+sqlalchemy
+psycopg2-binary
+
+# Google APIs
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
