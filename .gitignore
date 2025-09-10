@@ -133,4 +133,4 @@ ipython_config.py
 # Binarios descargados localmente
 cloud-sql-proxy
 
-client_secrets.json
+client_secret.json
