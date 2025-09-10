@@ -1,14 +1,14 @@
 # run_worker.py
 from app.queues import redis_conn, guardian_queue
-from rq import SimpleWorker
+from rq import Worker
 
 if __name__ == '__main__':
     if redis_conn and guardian_queue:
-        print("Starting RQ SimpleWorker in permanent mode...")
-        worker = SimpleWorker([guardian_queue], connection=redis_conn)
+        print("Starting standard RQ Worker...")
+        # Volvemos al Worker estándar, que es más robusto en Linux.
+        worker = Worker([guardian_queue], connection=redis_conn)
         
-        # Simplemente llamamos a .work() sin parámetros.
-        # El worker se quedará escuchando para siempre.
+        # Lo ejecutamos sin parámetros para que escuche de forma continua.
         worker.work()
         
     else:
