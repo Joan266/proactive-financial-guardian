@@ -1,14 +1,15 @@
 # run_worker.py
 from app.queues import redis_conn, guardian_queue
-from rq import Worker
+from rq import SimpleWorker
 
 if __name__ == '__main__':
     if redis_conn and guardian_queue:
-        print("Starting RQ worker in BURST mode (for Windows compatibility)...")
-        worker = Worker([guardian_queue], connection=redis_conn)
+        print("Starting RQ SimpleWorker in permanent mode...")
+        worker = SimpleWorker([guardian_queue], connection=redis_conn)
         
-        worker.work(burst=True)
+        # Simplemente llamamos a .work() sin parámetros.
+        # El worker se quedará escuchando para siempre.
+        worker.work()
         
-        print("Worker finished job and is shutting down.")
     else:
         print("Cannot start worker, Redis connection not available.")
