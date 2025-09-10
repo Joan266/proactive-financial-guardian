@@ -1,6 +1,6 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, Text
 from .database import Base
+from sqlalchemy import Column, Integer, String, Text, JSON 
 
 class User(Base):
     __tablename__ = "users"
@@ -8,5 +8,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     bank_username = Column(String)
-    encrypted_bank_password = Column(String) # Placeholder for now
+    encrypted_bank_password = Column(String)
     google_creds_json = Column(Text)
+
+    # --- NUEVOS CAMPOS ---
+    financial_goals_doc_url = Column(String, nullable=True)
+    financial_goals = Column(JSON, nullable=True) # Para el JSON de Gemini
