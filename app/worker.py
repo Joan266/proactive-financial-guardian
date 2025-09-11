@@ -1,54 +1,54 @@
 # app/worker.py
-import time
 from datetime import datetime, timedelta
 from app.database import SessionLocal
 from app.models import User
-import os
-from app.services import financial_analysis_service
-from app.services import google_calendar_service
-
-def run_payment_prediction(user_id: int):
+from app.tools.google_tools import GoogleApisTool
+from app.tools.bank_tools import BankTool
+from . import security
+def run_financial_agent_task(user_id: int):
     """
-    Orquesta el análisis financiero para un usuario.
+    The main agent task that orchestrates various tools to perform financial analysis.
     """
-    print(f"--- [Worker] Iniciando análisis para user_id: {user_id} ---")
+    print(f"--- [Agent Worker] Starting task for user_id: {user_id} ---")
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            print(f"Usuario {user_id} no encontrado.")
+            print(f"User {user_id} not found.")
             return
 
+        decrypted_creds = security.decrypt_data(user.google_creds_json)
+        google_tool = GoogleApisTool(credentials_json=decrypted_creds) 
+        
+        bank_tool = BankTool()
+
         if user.financial_goals_doc_url and not user.financial_goals:
-            print("Procesando metas financieras...")
+            print("Agent Thought: I need to understand the user's financial goals.")
             
-            content = financial_analysis_service.get_document_content(
-                user.google_creds_json, user.financial_goals_doc_url
-            )
+            content = google_tool.read_document_content(user.financial_goals_doc_url)
             
             if content:
-                goals = financial_analysis_service.analyze_goals_with_gemini(content)
+                goals = google_tool.analyze_text_with_gemini(content)
                 if goals:
                     user.financial_goals = goals
                     db.commit()
-                    print(f"Metas de Gemini guardadas para el usuario {user.email}")
-        print("Intentando crear un evento de calendario de prueba...")
+                    print(f"Agent Action: Saved financial goals for user {user.email}")
         
+   
+        print("Agent Thought: I will create a reminder for the user.")
         start_time = datetime.now() + timedelta(days=1)
         start_time = start_time.replace(hour=10, minute=0, second=0, microsecond=0)
         end_time = start_time + timedelta(hours=1)
         
-        google_calendar_service.create_calendar_event(
-            credentials_json=user.google_creds_json,
-            summary="Prueba de Guardián Financiero",
-            description="Si ves esto, ¡la integración con Google Calendar funciona!",
+        google_tool.create_calendar_event(
+            summary="Financial Guardian Check-in",
+            description="This is a test event to confirm the agent is working.",
             start_time=start_time,
             end_time=end_time
         )
-        time.sleep(2)
 
     finally:
         db.close()
     
-    print(f"--- [Worker] Finalizado análisis para user_id: {user_id} ---")
-    return f"Task completed for user {user_id}"
+    print(f"--- [Agent Worker] Task finished for user_id: {user_id} ---")
+    return f"Agent task completed for user {user_id}"
