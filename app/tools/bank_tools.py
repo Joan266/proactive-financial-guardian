@@ -7,8 +7,8 @@ class BankTool:
 
     def __init__(self):
         """Initializes the tool and the underlying bank client."""
-        base_url = os.environ.get("BANK_OF_ANTHOS_URL", "http://localhost:8080")
-        self.client = BankOfAnthosClient(base_url=base_url)
+        self.base_url = os.environ.get("BANK_OF_ANTHOS_URL", "http://34.173.134.229") 
+        self.client = BankOfAnthosClient(base_url=self.base_url)
         self._is_logged_in = False
 
     def login(self, username: str, password: str) -> bool:
@@ -24,12 +24,44 @@ class BankTool:
 
     def get_account_data(self) -> dict | None:
         """
-        Retrieves account balance and transactions after a successful login.
-        Returns a dictionary with 'balance' and 'transactions' or None on failure.
+        Retrieves account balance and transactions and formats them using MCP.
         """
         if not self._is_logged_in:
             print("Cannot get account data: not logged in.")
             return None
         
         print("Fetching account data from bank...")
-        return self.client.get_account_data()
+        raw_data = self.client.get_account_data()
+        
+        if not raw_data:
+            return None
+            
+        print("Formatting account data as MCP.")
+        return self._to_mcp(raw_data)
+
+    def _to_mcp(self, data: dict) -> dict:
+        """Converts raw bank data to the Model Context Protocol format."""
+        
+        mcp_transactions = []
+        for tx in data.get('transactions', []):
+            mcp_transactions.append({
+                "@type": "FinancialTransaction",
+                "description": tx.get("label"),
+                "transactionAmount": {
+                    "@type": "MonetaryAmount",
+                    "value": tx.get("amount"),
+                    "currency": "USD" 
+                },
+                "valueDate": tx.get("date")
+            })
+
+        return {
+            "@type": "BankAccount",
+            "url": self.base_url,
+            "balance": {
+                "@type": "MonetaryAmount",
+                "value": data.get("balance"),
+                "currency": "USD"
+            },
+            "transactions": mcp_transactions
+        }

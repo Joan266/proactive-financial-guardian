@@ -4,7 +4,7 @@ from app.database import SessionLocal
 from app.models import User
 from app.tools.google_tools import GoogleApisTool
 from app.tools.bank_tools import BankTool
-
+from . import security
 def run_financial_agent_task(user_id: int):
     """
     The main agent task that orchestrates various tools to perform financial analysis.
@@ -17,7 +17,8 @@ def run_financial_agent_task(user_id: int):
             print(f"User {user_id} not found.")
             return
 
-        google_tool = GoogleApisTool(credentials_json=user.google_creds_json)
+        decrypted_creds = security.decrypt_data(user.google_creds_json)
+        google_tool = GoogleApisTool(credentials_json=decrypted_creds) 
         
         bank_tool = BankTool()
 
