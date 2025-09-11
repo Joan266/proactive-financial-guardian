@@ -20,7 +20,6 @@ SCOPES = [
 
 router = APIRouter()
 
-# Dependency to get a DB session
 def get_db():
     db = SessionLocal()
     try:
