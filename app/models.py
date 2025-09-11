@@ -11,6 +11,5 @@ class User(Base):
     encrypted_bank_password = Column(String)
     google_creds_json = Column(Text)
 
-    # --- NUEVOS CAMPOS ---
     financial_goals_doc_url = Column(String, nullable=True)
-    financial_goals = Column(JSON, nullable=True) # Para el JSON de Gemini
+    financial_goals = Column(JSON, nullable=True) 
