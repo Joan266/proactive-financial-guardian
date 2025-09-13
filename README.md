@@ -142,3 +142,52 @@ Necesitarás **dos terminales de WSL** (ambas con el entorno virtual activado `s
 
       * Observa la salida en la **Terminal 2 (Worker)**. Verás los logs del procesamiento: lectura del Doc, llamada a Gemini y creación del evento en Calendar.
       * Revisa tu Google Calendar para ver el evento creado.
+
+## Deployment to Google Kubernetes Engine (GKE)
+
+This guide outlines the steps to deploy the Proactive Financial Guardian to a GKE cluster.
+
+1. **Prerequisites**
+
+      * A Google Cloud Platform (GCP) project with billing enabled.
+      * gcloud CLI installed and authenticated.
+      * kubectl installed.
+      * A registered domain name.
+      * Docker Desktop installed and running.
+
+2. **GCP Setup**
+
+      * Enable APIs: In your GCP project, enable the following APIs:
+      * Kubernetes Engine API
+      * Artifact Registry API
+      * Vertex AI API
+      * Google Docs API
+      * Google Calendar API
+      * Create GKE Cluster & Artifact Registry: (You can add your gcloud commands here for cluster and repository creation).
+      * Configure kubectl: gcloud container clusters get-credentials ...
+      * Reserve a Static IP: gcloud compute addresses create guardian-static-ip --global
+      * Configure DNS: Create an A record for your subdomain (e.g., guardian.your-domain.com) pointing to the reserved static IP.
+      * Grant Permissions: Grant the GKE nodes permission to pull from Artifact Registry.
+
+      ```bash
+      gcloud projects add-iam-policy-binding ...
+      ```
+3. **Building and Pushing Images**
+
+      For each deployment, build and push the versioned Docker images to avoid caching issues:
+
+      ```bash
+      # Example for v2
+      docker build -t us-central1-docker.pkg.dev/your-project/your-repo/api:v2 -f Dockerfile.api .
+      docker push us-central1-docker.pkg.dev/your-project/your-repo/api:v2
+      ```
+4. **Kubernetes Deployment Steps**
+
+      Apply the Kubernetes manifests in the following order:
+
+      * PostgreSQL: kubectl apply -f kubernetes/01-postgres.yaml
+      * Redis: kubectl apply -f kubernetes/02-redis.yaml
+      * Application Secrets: Create kubernetes/03-app-secrets.yaml with the necessary base64-encoded keys and apply it.
+      * Deployments: kubectl apply -f kubernetes/04-deployment.yaml (Ensure the image tag is updated to the latest version).
+      * Service & Ingress: Apply the 05-api-service.yaml, 06-certificate.yaml, 07-ingress.yaml, and 08-backend-config.yaml files to configure networking and SSL.
+      * Database Migration: Run the one-time database table creation job: kubectl apply -f kubernetes/09-create-tables-job.yaml

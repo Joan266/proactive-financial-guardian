@@ -2,8 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: guardian-api-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "guardian-backend-config"}'
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: guardian-api
   ports:

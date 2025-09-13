@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-db-tables
+spec:
+  template:
+    spec:
+      containers:
+      - name: db-migration
+        image: us-central1-docker.pkg.dev/bank-anthos/proactive-guardian-repo/job:v1
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://postgres:mysecretpassword@postgres-service/postgres"
+      restartPolicy: Never
+  backoffLimit: 4

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: api-server
-        image: us-central1-docker.pkg.dev/bank-anthos/proactive-guardian-repo/api:v1
+        image: us-central1-docker.pkg.dev/bank-anthos/proactive-guardian-repo/api:v2
         ports:
         - containerPort: 8080
         env:
@@ -22,6 +22,8 @@ spec:
           value: "postgresql://postgres:mysecretpassword@postgres-service/postgres"
         - name: REDIS_HOST
           value: "redis-service"
+        - name: APP_BASE_URL
+          value: "https://guardian.rent-fraud-check-api.es"
         - name: GOOGLE_API_KEY
           valueFrom:
             secretKeyRef:
@@ -32,9 +34,15 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: ENCRYPTION_KEY
+        - name: SESSION_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: SESSION_SECRET_KEY
         volumeMounts:
         - name: google-creds
-          mountPath: "/app"
+          mountPath: "/app/client_secret.json"
+          subPath: "client_secret.json"
           readOnly: true
       volumes:
       - name: google-creds

@@ -1,4 +1,4 @@
-# Dockerfile.api
+# Dockerfile.job
 
 FROM python:3.11-slim
 
@@ -10,4 +10,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--proxy-headers"]
+CMD ["python", "create_tables.py"]
