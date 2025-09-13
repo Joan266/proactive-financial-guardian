@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: guardian-ingress
+  annotations:
+  
+    kubernetes.io/ingress.global-static-ip-name: "guardian-static-ip"
+    
+    networking.gke.io/managed-certificates: "guardian-certificate"
+    
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  defaultBackend:
+    service:
+      name: guardian-api-service 
+      port:
+        number: 80

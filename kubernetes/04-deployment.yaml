@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guardian-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guardian-api
+  template:
+    metadata:
+      labels:
+        app: guardian-api
+    spec:
+      containers:
+      - name: api-server
+        image: us-central1-docker.pkg.dev/bank-anthos/proactive-guardian-repo/api:v2
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://postgres:mysecretpassword@postgres-service/postgres"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: APP_BASE_URL
+          value: "https://guardian.rent-fraud-check-api.es"
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: GOOGLE_API_KEY
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: ENCRYPTION_KEY
+        - name: SESSION_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: SESSION_SECRET_KEY
+        volumeMounts:
+        - name: google-creds
+          mountPath: "/app/client_secret.json"
+          subPath: "client_secret.json"
+          readOnly: true
+      volumes:
+      - name: google-creds
+        secret:
+          secretName: app-secrets
+          items:
+          - key: client_secret.json
+            path: client_secret.json
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guardian-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guardian-worker
+  template:
+    metadata:
+      labels:
+        app: guardian-worker
+    spec:
+      containers:
+      - name: rq-worker
+        image: us-central1-docker.pkg.dev/bank-anthos/proactive-guardian-repo/worker:v1
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://postgres:mysecretpassword@postgres-service/postgres"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: GOOGLE_API_KEY
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: ENCRYPTION_KEY
