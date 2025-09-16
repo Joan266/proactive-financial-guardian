@@ -1,5 +1,5 @@
 # run_worker.py
-from app.queues import redis_conn, guardian_queue
+from guardian_orchestrator.queues import redis_conn, guardian_queue
 from rq import Worker
 
 if __name__ == '__main__':

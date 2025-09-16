@@ -1,9 +1,9 @@
 # app/worker.py
 from datetime import datetime, timedelta
-from app.database import SessionLocal
-from app.models import User
-from app.tools.google_tools import GoogleApisTool
-from app.tools.bank_tools import BankTool
+from guardian_orchestrator.database import SessionLocal
+from guardian_orchestrator.models import User
+from guardian_orchestrator.tools.google_tools import GoogleApisTool
+from guardian_orchestrator.tools.bank_tools import BankTool
 from . import security
 def run_financial_agent_task(user_id: int):
     """

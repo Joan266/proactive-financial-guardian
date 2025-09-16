@@ -9,13 +9,14 @@ from googleapiclient.discovery import build
 from sqlalchemy.orm import Session
 from .. import crud, models
 from ..database import SessionLocal
-
+from .. import security
 # --- Configuration ---
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 CLIENT_SECRETS_FILE = "client_secret.json"
 SCOPES = [
     "https://www.googleapis.com/auth/calendar.events",
     "https://www.googleapis.com/auth/documents.readonly",
+    "https://www.googleapis.com/auth/gmail.readonly",
     "openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"
 ]
 
@@ -84,10 +85,23 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
         user_email = user_info['email']
 
         db_user = crud.get_user_by_email(db, email=user_email)
-        if not db_user:
+
+        # Encrypt the new credentials
+        encrypted_creds = security.encrypt_data(credentials.to_json())
+
+        if db_user:
+            # If user exists, UPDATE their credentials
+            print(f"DEBUG: User {user_email} found. Updating credentials.")
+            db_user.google_creds_json = encrypted_creds
+            db.commit()
+        else:
+            # If user does not exist, CREATE a new one
+            print(f"DEBUG: User {user_email} not found. Creating new user.")
             user_data = {
-                "email": user_email, "bank_username": "testuser",
-                "bank_password": "bankofanthos", "google_creds_json": credentials.to_json()
+                "email": user_email, 
+                "bank_username": "testuser",
+                "bank_password": "bankofanthos", 
+                "google_creds_json": credentials.to_json() # crud.create_user handles encryption
             }
             crud.create_user(db, user_data=user_data)
         

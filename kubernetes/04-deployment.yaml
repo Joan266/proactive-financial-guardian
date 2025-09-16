@@ -41,7 +41,7 @@ spec:
               key: SESSION_SECRET_KEY
         volumeMounts:
         - name: google-creds
-          mountPath: "/app/client_secret.json"
+          mountPath: "/guardian_orchestrator/client_secret.json"
           subPath: "client_secret.json"
           readOnly: true
       volumes:

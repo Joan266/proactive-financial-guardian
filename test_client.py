@@ -1,6 +1,6 @@
 # test_client.py
 
-from app.clients.bank_of_anthos_client import BankOfAnthosClient
+from guardian_orchestrator.clients.bank_of_anthos_client import BankOfAnthosClient
 import os
 import json
 

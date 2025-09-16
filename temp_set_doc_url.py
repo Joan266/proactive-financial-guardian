@@ -1,6 +1,6 @@
 # temp_set_doc_url.py
-from app.database import SessionLocal
-from app.models import User
+from guardian_orchestrator.database import SessionLocal
+from guardian_orchestrator.models import User
 
 USER_EMAIL_TO_UPDATE = "joanalemany26@gmail.com"
 GOOGLE_DOC_URL = "https://docs.google.com/document/d/1K8pT3Mc2Kupf2hRnHPc9a-jTLfV6igAL4Us8b9gGe3A/edit?tab=t.0"

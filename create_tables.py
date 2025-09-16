@@ -1,6 +1,6 @@
 # create_tables.py
-from app.database import engine, Base
-from app.models import User  
+from guardian_orchestrator.database import engine, Base
+from guardian_orchestrator.models import User  
 
 print("Connecting to the database and creating tables...")
 
